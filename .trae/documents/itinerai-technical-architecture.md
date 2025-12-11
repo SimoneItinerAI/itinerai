@@ -28,25 +28,31 @@ graph TD
 
 ## 2. Technology Description
 
-- **Frontend**: React@18 + TypeScript + TailwindCSS@3 + Vite
-- **Initialization Tool**: vite-init
-- **Backend**: Supabase (BaaS)
-- **State Management**: React hooks (useState, useEffect)
-- **Routing**: React Router DOM (to be implemented)
-- **Icons**: Lucide React
-- **AI Integration**: Custom service layer for LLM API calls
+* **Frontend**: React\@18 + TypeScript + TailwindCSS\@3 + Vite
+
+* **Initialization Tool**: vite-init
+
+* **Backend**: Supabase (BaaS)
+
+* **State Management**: React hooks (useState, useEffect)
+
+* **Routing**: React Router DOM (to be implemented)
+
+* **Icons**: Lucide React
+
+* **AI Integration**: Custom service layer for LLM API calls
 
 ## 3. Route definitions
 
-| Route | Purpose |
-|-------|---------|
-| / | Homepage con presentazione servizio e CTA |
-| /create | Form creazione itinerario multi-step |
-| /itineraries | Lista itinerari salvati dell'utente |
+| Route          | Purpose                                              |
+| -------------- | ---------------------------------------------------- |
+| /              | Homepage con presentazione servizio e CTA            |
+| /create        | Form creazione itinerario multi-step                 |
+| /itineraries   | Lista itinerari salvati dell'utente                  |
 | /itinerary/:id | Dettaglio singolo itinerario con opzioni di modifica |
-| /auth/login | Pagina login utente |
-| /auth/register | Pagina registrazione nuovo utente |
-| /profile | Profilo utente con dati e preferenze |
+| /auth/login    | Pagina login utente                                  |
+| /auth/register | Pagina registrazione nuovo utente                    |
+| /profile       | Profilo utente con dati e preferenze                 |
 
 ## 4. API definitions
 
@@ -57,17 +63,19 @@ POST /auth/v1/token
 ```
 
 Request:
-| Param Name | Param Type | isRequired | Description |
-|------------|-------------|-------------|-------------|
-| email | string | true | Email dell'utente |
-| password | string | true | Password in chiaro |
+
+| Param Name | Param Type | isRequired | Description        |
+| ---------- | ---------- | ---------- | ------------------ |
+| email      | string     | true       | Email dell'utente  |
+| password   | string     | true       | Password in chiaro |
 
 Response:
-| Param Name | Param Type | Description |
-|------------|-------------|-------------|
-| access_token | string | JWT token per autenticazione |
-| refresh_token | string | Token per rinnovo sessione |
-| user | object | Dati utente completo |
+
+| Param Name     | Param Type | Description                  |
+| -------------- | ---------- | ---------------------------- |
+| access\_token  | string     | JWT token per autenticazione |
+| refresh\_token | string     | Token per rinnovo sessione   |
+| user           | object     | Dati utente completo         |
 
 ### 4.2 Itinerary APIs
 
@@ -76,24 +84,26 @@ POST /rest/v1/itineraries
 ```
 
 Request:
-| Param Name | Param Type | isRequired | Description |
-|------------|-------------|-------------|-------------|
-| destination | string | true | Città o paese destinazione |
-| start_date | date | true | Data inizio viaggio |
-| end_date | date | true | Data fine viaggio |
-| travelers_count | integer | true | Numero di viaggiatori |
-| budget | string | true | Budget: economico/medio/comfort |
-| pace | string | true | Ritmo: tranquillo/equilibrato/intenso |
-| interests | array | false | Array di interessi selezionati |
-| notes | string | false | Note aggiuntive utente |
+
+| Param Name       | Param Type | isRequired | Description                           |
+| ---------------- | ---------- | ---------- | ------------------------------------- |
+| destination      | string     | true       | Città o paese destinazione            |
+| start\_date      | date       | true       | Data inizio viaggio                   |
+| end\_date        | date       | true       | Data fine viaggio                     |
+| travelers\_count | integer    | true       | Numero di viaggiatori                 |
+| budget           | string     | true       | Budget: economico/medio/comfort       |
+| pace             | string     | true       | Ritmo: tranquillo/equilibrato/intenso |
+| interests        | array      | false      | Array di interessi selezionati        |
+| notes            | string     | false      | Note aggiuntive utente                |
 
 Response:
-| Param Name | Param Type | Description |
-|------------|-------------|-------------|
-| id | uuid | ID univoco itinerario |
-| created_at | timestamp | Data creazione |
-| status | string | Stato: draft/generated/completed |
-| itinerary_data | json | Dati completi itinerario generato |
+
+| Param Name      | Param Type | Description                       |
+| --------------- | ---------- | --------------------------------- |
+| id              | uuid       | ID univoco itinerario             |
+| created\_at     | timestamp  | Data creazione                    |
+| status          | string     | Stato: draft/generated/completed  |
+| itinerary\_data | json       | Dati completi itinerario generato |
 
 ### 4.3 AI Generation API
 
@@ -102,18 +112,20 @@ POST /api/ai/generate-itinerary
 ```
 
 Request:
-| Param Name | Param Type | isRequired | Description |
-|------------|-------------|-------------|-------------|
-| destination | string | true | Destinazione principale |
-| preferences | object | true | Oggetto con tutte le preferenze utente |
-| constraints | object | false | Vincoli specifici (bambini, mobilità, etc.) |
+
+| Param Name  | Param Type | isRequired | Description                                 |
+| ----------- | ---------- | ---------- | ------------------------------------------- |
+| destination | string     | true       | Destinazione principale                     |
+| preferences | object     | true       | Oggetto con tutte le preferenze utente      |
+| constraints | object     | false      | Vincoli specifici (bambini, mobilità, etc.) |
 
 Response:
-| Param Name | Param Type | Description |
-|------------|-------------|-------------|
-| itineraries | array | Array di 2-3 proposte itinerario |
-| confidence_score | number | Punteggio affidabilità AI |
-| generation_time | number | Tempo generazione in secondi |
+
+| Param Name        | Param Type | Description                      |
+| ----------------- | ---------- | -------------------------------- |
+| itineraries       | array      | Array di 2-3 proposte itinerario |
+| confidence\_score | number     | Punteggio affidabilità AI        |
+| generation\_time  | number     | Tempo generazione in secondi     |
 
 ## 5. Server architecture diagram
 
@@ -199,6 +211,7 @@ erDiagram
 ### 6.2 Data Definition Language
 
 **Users Table**
+
 ```sql
 -- create table
 CREATE TABLE users (
@@ -218,6 +231,7 @@ CREATE INDEX idx_users_created_at ON users(created_at DESC);
 ```
 
 **Itineraries Table**
+
 ```sql
 -- create table
 CREATE TABLE itineraries (
@@ -246,6 +260,7 @@ CREATE INDEX idx_itineraries_created_at ON itineraries(created_at DESC);
 ```
 
 **Preferences Table**
+
 ```sql
 -- create table
 CREATE TABLE preferences (
@@ -314,3 +329,4 @@ GRANT ALL PRIVILEGES ON users TO authenticated;
 GRANT ALL PRIVILEGES ON itineraries TO authenticated;
 GRANT ALL PRIVILEGES ON preferences TO authenticated;
 ```
+

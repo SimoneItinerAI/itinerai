@@ -1,0 +1,30 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: itinerai
+      POSTGRES_PASSWORD: itinerai
+      POSTGRES_DB: itinerai
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+  api:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql://itinerai:itinerai@db:5432/itinerai
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: change-me
+      PORT: 4000
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "4000:4000"
+volumes:
+  db_data:

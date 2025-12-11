@@ -1,0 +1,38 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ItinerAI API",
+    "version": "1.0.0",
+    "description": "API REST per ItinerAI"
+  },
+  "servers": [{ "url": "/api" }],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Registrazione utente",
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object","properties": {"email": {"type": "string"},"password": {"type": "string"},"name": {"type": "string"}},"required": ["email","password","name"]}}}},
+        "responses": {"201": {"description": "Creato"}}
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login utente",
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object","properties": {"email": {"type": "string"},"password": {"type": "string"}},"required": ["email","password"]}}}},
+        "responses": {"200": {"description": "OK"}}
+      }
+    },
+    "/itineraries": {
+      "get": {"summary": "Lista itinerari", "responses": {"200": {"description": "OK"}}},
+      "post": {
+        "summary": "Crea itinerario",
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object","properties": {"destination": {"type": "string"},"start_date": {"type": "string"},"end_date": {"type": "string"},"travelers_count": {"type": "integer"},"budget": {"type": "string"},"pace": {"type": "string"},"interests": {"type": "array","items": {"type": "string"}},"notes": {"type": "string"}},"required": ["destination","start_date","end_date","travelers_count","budget","pace"]}}}},
+        "responses": {"201": {"description": "Creato"}}
+      }
+    },
+    "/itineraries/{id}": {
+      "get": {"summary": "Dettaglio itinerario","parameters": [{"name": "id","in": "path","required": true,"schema": {"type": "string"}}],"responses": {"200": {"description": "OK"}}},
+      "put": {"summary": "Aggiorna itinerario","parameters": [{"name": "id","in": "path","required": true,"schema": {"type": "string"}}],"requestBody": {"required": true,"content": {"application/json": {"schema": {"type": "object"}}}},"responses": {"200": {"description": "OK"}}},
+      "delete": {"summary": "Elimina itinerario","parameters": [{"name": "id","in": "path","required": true,"schema": {"type": "string"}}],"responses": {"204": {"description": "No Content"}}}
+    }
+  }
+}

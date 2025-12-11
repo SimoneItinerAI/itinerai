@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password_hash String
+  name          String
+  preferences   Json?
+  created_at    DateTime @default(now())
+  last_login    DateTime?
+  updated_at    DateTime @default(now())
+  itineraries   Itinerary[]
+  preferencesSet Preference[]
+}
+
+model Itinerary {
+  id               String   @id @default(uuid())
+  user_id          String?
+  user             User?    @relation(fields: [user_id], references: [id])
+  destination      String
+  start_date       DateTime
+  end_date         DateTime
+  travelers_count  Int
+  travelers_type   String?
+  budget           String
+  pace             String
+  interests        Json?
+  constraints      Json?
+  itinerary_data   Json?
+  status           String   @default("draft")
+  created_at       DateTime @default(now())
+  updated_at       DateTime @default(now())
+}
+
+model Preference {
+  id              String   @id @default(uuid())
+  user_id         String
+  user            User     @relation(fields: [user_id], references: [id])
+  travel_styles   Json?
+  interests       Json?
+  budget_ranges   Json?
+  has_kids        Boolean  @default(false)
+  reduced_mobility Boolean @default(false)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @default(now())
+}
