@@ -26,7 +26,8 @@ Piattaforma AI per la pianificazione di viaggi. Inserisci destinazione, date e p
 
 ## Deploy
 - Piattaforma: `Vercel`
-- Redirect `www.itinerai.travel` → `itinerai.travel` configurato in `vercel.json`
+- Redirect `www.itinerai.travel` → `itinerai.travel` via `vercel.json`
+- `cleanUrls` attivo per URL senza `.html`
 
 ## Collegamento a GitHub
 1. Crea un repository su GitHub (es. `itinerai.travel`)

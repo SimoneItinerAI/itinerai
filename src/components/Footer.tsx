@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Mail, Phone, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { Mail, Phone, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
@@ -9,9 +9,7 @@ export const Footer: React.FC = () => {
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-accent to-accent-dark rounded-lg flex items-center justify-center">
-                <MapPin className="w-5 h-5 text-white" />
-              </div>
+              <img src="/logo.png" alt="ItinerAI logo" className="w-8 h-8" />
               <span className="text-xl font-bold">ItinerAI</span>
             </div>
             <p className="text-neutral-300 leading-relaxed">
