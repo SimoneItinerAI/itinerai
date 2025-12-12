@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, MapPin, Calendar, Users, Wallet, Gauge, Heart, X, Sparkles, CheckCircle2, Plane } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Users, Sparkles, CheckCircle2, Plane } from 'lucide-react';
 
 interface CreateItineraryProps {
   onBack: () => void;

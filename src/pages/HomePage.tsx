@@ -2,20 +2,15 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   MapPin, 
-  Calendar, 
-  Users, 
   Sparkles, 
   Clock, 
-  DollarSign, 
   Star, 
   ChevronDown,
   Send,
   CheckCircle,
   Coffee,
   Camera,
-  Utensils,
-  Plus,
-  Minus
+  Utensils
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';

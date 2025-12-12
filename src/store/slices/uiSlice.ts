@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-type Toast = { id: string; message: string; type: 'success'|'error'|'info' }
+export type Toast = { id: string; message: string; type: 'success'|'error'|'info' }
 type UiState = { loading: boolean; toasts: Toast[] }
 
 const initialState: UiState = { loading: false, toasts: [] }

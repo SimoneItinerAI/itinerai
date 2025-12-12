@@ -5,16 +5,12 @@ import {
   Users, 
   DollarSign, 
   Clock, 
-  Heart, 
   Plus, 
   Minus,
   ArrowLeft,
   ArrowRight,
   Sparkles,
-  CheckCircle,
-  Coffee,
-  Camera,
-  Utensils,
+  Heart,
   Shield,
   Baby,
   Edit3,
@@ -198,7 +194,7 @@ export const CreateItineraryPage: React.FC = () => {
                   {['economico', 'medio', 'comfort'].map((budget) => (
                     <button
                       key={budget}
-                      onClick={() => setPreferences({...preferences, budget: budget as any})}
+                      onClick={() => setPreferences({...preferences, budget: budget as 'economico'|'medio'|'comfort'})}
                       className={`p-4 rounded-lg border-2 transition-all ${
                         preferences.budget === budget
                           ? 'border-accent bg-accent/10 text-accent'
@@ -225,7 +221,7 @@ export const CreateItineraryPage: React.FC = () => {
                   {['tranquillo', 'equilibrato', 'intenso'].map((pace) => (
                     <button
                       key={pace}
-                      onClick={() => setPreferences({...preferences, pace: pace as any})}
+                      onClick={() => setPreferences({...preferences, pace: pace as 'tranquillo'|'equilibrato'|'intenso'})}
                       className={`p-4 rounded-lg border-2 transition-all ${
                         preferences.pace === pace
                           ? 'border-accent bg-accent/10 text-accent'

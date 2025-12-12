@@ -32,4 +32,11 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
   } catch (e) { next(e); }
 });
 
+router.post('/forgot', async (req: Request, res: Response, _next: NextFunction) => {
+  const email = String(req.body?.email || '')
+  const isEmail = /.+@.+\..+/.test(email)
+  if (!isEmail) return res.status(400).json({ error: { message: 'Invalid email', code: 400 } })
+  res.json({ ok: true })
+});
+
 export default router;

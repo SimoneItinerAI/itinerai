@@ -1,18 +1,22 @@
 import { useState } from 'react'
 import { useForgotPasswordMutation } from '../services/authApi'
 import { Button } from '../components/ui/Button'
+import { useDispatch } from 'react-redux'
+import { pushToast } from '../store/slices/uiSlice'
+import type React from 'react'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [forgot] = useForgotPasswordMutation()
+  const dispatch = useDispatch()
 
-  const onSubmit = async (e: any) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const valid = /.+@.+\..+/.test(email)
     if (!valid) return
-    const res = await forgot({ email }).unwrap().catch(() => null)
-    if (res) setSent(true)
+    const res = await forgot({ email }).unwrap().catch(() => { dispatch(pushToast({ id: Date.now().toString(), message: 'Errore invio email', type: 'error' })); return null })
+    if (res) { setSent(true); dispatch(pushToast({ id: Date.now().toString(), message: 'Email inviata', type: 'success' })) }
   }
 
   return (

@@ -2,7 +2,10 @@ import { useState } from 'react'
 import { useRegisterMutation } from '../services/authApi'
 import { useDispatch } from 'react-redux'
 import { setAuth, setError, setLoading } from '../store/slices/authSlice'
+import { pushToast } from '../store/slices/uiSlice'
 import { Button } from '../components/ui/Button'
+import { useNavigate } from 'react-router-dom'
+import type React from 'react'
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('')
@@ -11,14 +14,19 @@ export default function RegisterPage() {
   const [name, setName] = useState('')
   const [register] = useRegisterMutation()
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
-  const onSubmit = async (e: any) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const valid = /.+@.+\..+/.test(email) && password.length >= 8 && password === confirm && name.length > 0
     if (!valid) return dispatch(setError('Dati non validi'))
     dispatch(setLoading())
-    const res = await register({ email, password, name }).unwrap().catch((e) => { dispatch(setError('Registrazione fallita')); return null })
-    if (res) dispatch(setAuth({ user: res.user, token: res.access_token }))
+    const res = await register({ email, password, name }).unwrap().catch(() => { dispatch(setError('Registrazione fallita')); dispatch(pushToast({ id: Date.now().toString(), message: 'Registrazione fallita', type: 'error' })); return null })
+    if (res) {
+      dispatch(setAuth({ user: res.user, token: res.access_token }))
+      dispatch(pushToast({ id: Date.now().toString(), message: 'Account creato', type: 'success' }))
+      navigate('/dashboard')
+    }
   }
 
   return (

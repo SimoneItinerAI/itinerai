@@ -8,9 +8,9 @@ export interface User {
 }
 
 export interface UserPreferences {
-  travel_styles: Record<string, any>;
+  travel_styles: Record<string, unknown>;
   interests: string[];
-  budget_ranges: Record<string, any>;
+  budget_ranges: Record<string, unknown>;
   has_kids: boolean;
   reduced_mobility: boolean;
 }
@@ -26,7 +26,7 @@ export interface Itinerary {
   budget: 'economico' | 'medio' | 'comfort';
   pace: 'tranquillo' | 'equilibrato' | 'intenso';
   interests: string[];
-  constraints: Record<string, any>;
+  constraints: Record<string, unknown>;
   itinerary_data: ItineraryData;
   status: 'draft' | 'generating' | 'generated' | 'completed';
   created_at: string;

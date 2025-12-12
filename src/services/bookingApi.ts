@@ -8,7 +8,7 @@ type Itinerary = {
   travelers_count: number
   budget: string
   pace: string
-  interests?: any
+  interests?: string[]
   notes?: string
 }
 

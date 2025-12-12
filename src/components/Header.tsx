@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, User } from 'lucide-react';
 import { Button } from './ui/Button';
+import { useSelector, useDispatch } from 'react-redux'
+import { clearAuth } from '../store/slices/authSlice'
+import { pushToast } from '../store/slices/uiSlice'
+import { RootState } from '../store'
 
 export const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const user = useSelector((s: RootState) => s.auth.user)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const navigationItems = [
     { name: 'Come funziona', href: '#how-it-works' },
@@ -38,10 +45,33 @@ export const Header: React.FC = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="sm">
-              <User className="w-4 h-4 mr-2" />
-              Accedi
-            </Button>
+            {!user ? (
+              <>
+                <Link to="/login">
+                  <Button variant="ghost" size="sm">
+                    <User className="w-4 h-4 mr-2" />
+                    Accedi
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button variant="outline" size="sm">Registrati</Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <span className="text-neutral-700">{user.name}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => { dispatch(clearAuth()); dispatch(pushToast({ id: Date.now().toString(), message: 'Logout effettuato', type: 'info' })); navigate('/'); }}
+                >
+                  Esci
+                </Button>
+                <Link to="/dashboard">
+                  <Button variant="secondary" size="sm">Dashboard</Button>
+                </Link>
+              </>
+            )}
             <Link to="/create">
               <Button variant="primary" size="sm">
                 Crea Itinerario
@@ -77,10 +107,33 @@ export const Header: React.FC = () => {
                 </a>
               ))}
               <div className="flex flex-col space-y-2 pt-4 border-t border-neutral-200">
-                <Button variant="ghost" size="sm" className="justify-start">
-                  <User className="w-4 h-4 mr-2" />
-                  Accedi
-                </Button>
+                {!user ? (
+                  <>
+                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="ghost" size="sm" className="justify-start w-full">
+                        <User className="w-4 h-4 mr-2" />
+                        Accedi
+                      </Button>
+                    </Link>
+                    <Link to="/register" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="outline" size="sm" className="justify-start w-full">Registrati</Button>
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="justify-start w-full"
+                      onClick={() => { setIsMenuOpen(false); dispatch(clearAuth()); dispatch(pushToast({ id: Date.now().toString(), message: 'Logout effettuato', type: 'info' })); navigate('/'); }}
+                    >
+                      Esci
+                    </Button>
+                    <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="secondary" size="sm" className="justify-start w-full">Dashboard</Button>
+                    </Link>
+                  </>
+                )}
                 <Link to="/create" onClick={() => setIsMenuOpen(false)}>
                   <Button variant="primary" size="sm" className="justify-start w-full">
                     Crea Itinerario

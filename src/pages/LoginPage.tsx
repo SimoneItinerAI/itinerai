@@ -2,7 +2,10 @@ import { useState } from 'react'
 import { useLoginMutation } from '../services/authApi'
 import { useDispatch } from 'react-redux'
 import { setAuth, setError, setLoading } from '../store/slices/authSlice'
+import { pushToast } from '../store/slices/uiSlice'
 import { Button } from '../components/ui/Button'
+import { Link, useNavigate } from 'react-router-dom'
+import type React from 'react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -10,14 +13,19 @@ export default function LoginPage() {
   const [show, setShow] = useState(false)
   const [login] = useLoginMutation()
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
-  const onSubmit = async (e: any) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const valid = /.+@.+\..+/.test(email) && password.length >= 8
     if (!valid) return dispatch(setError('Credenziali non valide'))
     dispatch(setLoading())
-    const res = await login({ email, password }).unwrap().catch((e) => { dispatch(setError('Login fallito')); return null })
-    if (res) dispatch(setAuth({ user: res.user, token: res.access_token }))
+    const res = await login({ email, password }).unwrap().catch(() => { dispatch(setError('Login fallito')); dispatch(pushToast({ id: Date.now().toString(), message: 'Login fallito', type: 'error' })); return null })
+    if (res) {
+      dispatch(setAuth({ user: res.user, token: res.access_token }))
+      dispatch(pushToast({ id: Date.now().toString(), message: 'Benvenuto!', type: 'success' }))
+      navigate('/dashboard')
+    }
   }
 
   return (
@@ -31,8 +39,9 @@ export default function LoginPage() {
         </div>
         <Button type="submit">Login</Button>
       </form>
-      <div className="mt-4 text-sm">
-        <a href="/forgot-password" className="underline">Password dimenticata?</a>
+      <div className="mt-4 text-sm flex items-center gap-4">
+        <Link to="/forgot-password" className="underline">Password dimenticata?</Link>
+        <Link to="/register" className="underline">Crea un account</Link>
       </div>
     </div>
   )
