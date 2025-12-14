@@ -20,6 +20,10 @@ import {
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { TravelPreferences } from '../types';
+import { useGenerateMutation } from '../services/bookingApi';
+import { useDispatch } from 'react-redux';
+import { pushToast } from '../store/slices/uiSlice';
+import { useNavigate } from 'react-router-dom';
 
 export const CreateItineraryPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -38,6 +42,9 @@ export const CreateItineraryPage: React.FC = () => {
     existingTransport: '',
     notes: ''
   });
+  const [generateItinerary, { isLoading }] = useGenerateMutation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const totalSteps = 4;
 
@@ -59,9 +66,31 @@ export const CreateItineraryPage: React.FC = () => {
     }
   };
 
-  const handleSubmit = () => {
-    console.log('Submitting preferences:', preferences);
-    // Here you would typically send the data to your backend
+  const handleSubmit = async () => {
+    try {
+      const payload = {
+        destination: preferences.destination,
+        start_date: preferences.startDate,
+        end_date: preferences.endDate,
+        travelers_count: preferences.travelersCount,
+        travelers_type: preferences.travelersType,
+        budget: preferences.budget,
+        pace: preferences.pace,
+        interests: preferences.interests,
+        constraints: {
+          has_kids: preferences.hasKids,
+          reduced_mobility: preferences.reducedMobility,
+          existing_accommodation: preferences.existingAccommodation,
+          existing_transport: preferences.existingTransport
+        },
+        notes: preferences.notes
+      };
+      const result = await generateItinerary(payload).unwrap();
+      dispatch(pushToast({ id: Date.now().toString(), message: 'Itinerario generato', type: 'success' }));
+      navigate(`/booking/${result.id}`);
+    } catch (e: any) {
+      dispatch(pushToast({ id: Date.now().toString(), message: e?.data?.error?.message || 'Errore generazione', type: 'error' }));
+    }
   };
 
   const toggleInterest = (interest: string) => {
@@ -486,9 +515,10 @@ export const CreateItineraryPage: React.FC = () => {
                 variant="primary"
                 onClick={handleSubmit}
                 className="flex items-center space-x-2"
+                disabled={isLoading}
               >
                 <Sparkles className="w-4 h-4" />
-                <span>Genera Itinerario</span>
+                <span>{isLoading ? 'Generazione...' : 'Genera Itinerario'}</span>
               </Button>
             )}
           </div>

@@ -167,7 +167,7 @@ export const HomePage: React.FC = () => {
           </div>
 
           <div className="max-w-5xl mx-auto">
-            <div className="overflow-x-auto">
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full bg-white rounded-2xl shadow-lg overflow-hidden">
                 <thead className="bg-primary text-white">
                   <tr>
@@ -210,6 +210,93 @@ export const HomePage: React.FC = () => {
                   </tr>
                 </tbody>
               </table>
+            </div>
+            <div className="md:hidden space-y-4">
+              <div className="bg-white rounded-2xl shadow-lg p-4">
+                <h3 className="text-lg font-semibold text-primary mb-2">Tempo di pianificazione</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-neutral-600">Viaggio senza AI</span>
+                    <span className="text-sm text-neutral-800">15-20 ore</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-neutral-600">Agenzia classica</span>
+                    <span className="text-sm text-neutral-800">2-3 giorni</span>
+                  </div>
+                  <div className="flex items-center justify-between bg-accent/10 rounded-lg px-3 py-2">
+                    <span className="text-sm font-semibold text-accent">ItinerAI</span>
+                    <span className="text-sm font-semibold text-accent">2-3 minuti</span>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-2xl shadow-lg p-4">
+                <h3 className="text-lg font-semibold text-primary mb-2">Personalizzazione</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-neutral-600">Viaggio senza AI</span>
+                    <span className="text-sm text-neutral-800">Limitata</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-neutral-600">Agenzia classica</span>
+                    <span className="text-sm text-neutral-800">Standard</span>
+                  </div>
+                  <div className="flex items-center justify-between bg-accent/10 rounded-lg px-3 py-2">
+                    <span className="text-sm font-semibold text-accent">ItinerAI</span>
+                    <span className="text-sm font-semibold text-accent">Totale</span>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-2xl shadow-lg p-4">
+                <h3 className="text-lg font-semibold text-primary mb-2">Costo</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-neutral-600">Viaggio senza AI</span>
+                    <span className="text-sm text-neutral-800">Variabile</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-neutral-600">Agenzia classica</span>
+                    <span className="text-sm text-neutral-800">€50-200</span>
+                  </div>
+                  <div className="flex items-center justify-between bg-accent/10 rounded-lg px-3 py-2">
+                    <span className="text-sm font-semibold text-accent">ItinerAI</span>
+                    <span className="text-sm font-semibold text-accent">A partire da €9</span>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-2xl shadow-lg p-4">
+                <h3 className="text-lg font-semibold text-primary mb-2">Copertura destinazioni</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-neutral-600">Viaggio senza AI</span>
+                    <span className="text-sm text-neutral-800">Limitata</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-neutral-600">Agenzia classica</span>
+                    <span className="text-sm text-neutral-800">Buona</span>
+                  </div>
+                  <div className="flex items-center justify-between bg-accent/10 rounded-lg px-3 py-2">
+                    <span className="text-sm font-semibold text-accent">ItinerAI</span>
+                    <span className="text-sm font-semibold text-accent">Mondiale</span>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-2xl shadow-lg p-4">
+                <h3 className="text-lg font-semibold text-primary mb-2">Aggiornamenti in tempo reale</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-neutral-600">Viaggio senza AI</span>
+                    <span className="text-sm text-neutral-800">❌</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-neutral-600">Agenzia classica</span>
+                    <span className="text-sm text-neutral-800">❌</span>
+                  </div>
+                  <div className="flex items-center justify-between bg-accent/10 rounded-lg px-3 py-2">
+                    <span className="text-sm font-semibold text-accent">ItinerAI</span>
+                    <span className="text-sm font-semibold text-accent">✅</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

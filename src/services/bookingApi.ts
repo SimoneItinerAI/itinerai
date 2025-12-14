@@ -2,14 +2,21 @@ import { api } from './api'
 
 type Itinerary = {
   id: string
+  user_id?: string
   destination: string
   start_date: string
   end_date: string
   travelers_count: number
+  travelers_type?: string
   budget: string
   pace: string
   interests?: string[]
   notes?: string
+  constraints?: Record<string, unknown>
+  itinerary_data?: any
+  status?: string
+  created_at?: string
+  updated_at?: string
 }
 
 export const bookingApi = api.injectEndpoints({
@@ -20,6 +27,10 @@ export const bookingApi = api.injectEndpoints({
     }),
     create: builder.mutation<Itinerary, Partial<Itinerary>>({
       query: (body) => ({ url: '/itineraries', method: 'POST', body }),
+      invalidatesTags: ['Booking']
+    }),
+    generate: builder.mutation<Itinerary, any>({
+      query: (body) => ({ url: '/itineraries/generate', method: 'POST', body }),
       invalidatesTags: ['Booking']
     }),
     get: builder.query<Itinerary, string>({
@@ -37,4 +48,4 @@ export const bookingApi = api.injectEndpoints({
   })
 })
 
-export const { useListQuery, useCreateMutation, useGetQuery, useUpdateMutation, useRemoveMutation } = bookingApi
+export const { useListQuery, useCreateMutation, useGenerateMutation, useGetQuery, useUpdateMutation, useRemoveMutation } = bookingApi

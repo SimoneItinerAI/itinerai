@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 import { setAuth, setError, setLoading } from '../store/slices/authSlice'
 import { pushToast } from '../store/slices/uiSlice'
 import { Button } from '../components/ui/Button'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import type React from 'react'
 
 export default function RegisterPage() {
@@ -30,15 +30,42 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto p-6">
-      <h1 className="text-xl font-semibold mb-4">Registrati</h1>
-      <form onSubmit={onSubmit} className="space-y-4">
-        <input className="w-full border rounded p-2" type="text" placeholder="Nome" value={name} onChange={(e) => setName(e.target.value)} />
-        <input className="w-full border rounded p-2" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <input className="w-full border rounded p-2" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        <input className="w-full border rounded p-2" type="password" placeholder="Conferma password" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
-        <Button type="submit">Crea account</Button>
-      </form>
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-blue-50 pt-24 px-4">
+      <div className="container mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div className="hidden md:block px-6">
+            <h2 className="text-3xl font-bold text-primary mb-3">Inizia con ItinerAI</h2>
+            <p className="text-neutral-600">Crea itinerari personalizzati con l’AI. Registrati gratis.</p>
+          </div>
+          <div className="w-full px-2 md:px-6">
+            <div className="w-full">
+              <h1 className="text-2xl font-semibold text-primary mb-4">Registrati</h1>
+              <form onSubmit={onSubmit} className="space-y-5" aria-label="Form di registrazione">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-neutral-700">Nome</label>
+                  <input id="name" name="name" aria-required="true" className="w-full border rounded-lg p-4 text-lg mt-1 focus:outline-none focus:ring-2 focus:ring-accent" type="text" placeholder="Il tuo nome" value={name} onChange={(e) => setName(e.target.value)} />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-neutral-700">Email</label>
+                  <input id="email" name="email" aria-required="true" className="w-full border rounded-lg p-4 text-lg mt-1 focus:outline-none focus:ring-2 focus:ring-accent" type="email" placeholder="nome@esempio.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                </div>
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-neutral-700">Password</label>
+                  <input id="password" name="password" aria-required="true" className="w-full border rounded-lg p-4 text-lg mt-1 focus:outline-none focus:ring-2 focus:ring-accent" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
+                </div>
+                <div>
+                  <label htmlFor="confirm" className="block text-sm font-medium text-neutral-700">Conferma password</label>
+                  <input id="confirm" name="confirm" aria-required="true" className="w-full border rounded-lg p-4 text-lg mt-1 focus:outline-none focus:ring-2 focus:ring-accent" type="password" placeholder="Ripeti la password" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+                </div>
+                <Button type="submit" className="w-full py-4 text-lg">Crea account</Button>
+              </form>
+              <div className="mt-5 text-sm flex flex-wrap items-center gap-4">
+                <Link to="/login" className="underline">Hai già un account? Accedi</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

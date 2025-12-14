@@ -1,6 +1,9 @@
+// Stack: Express API under /api (see app.ts). Prisma as DB client. Auth via JWT Bearer. Entrypoint for AI generation: POST /api/itineraries/generate.
 import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { ItineraryService } from '../services/itinerary.service.js';
+import jwt from 'jsonwebtoken';
+import { env } from '../utils/env.js';
 
 const router = Router();
 const service = new ItineraryService();
@@ -38,6 +41,26 @@ router.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
 
 router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try { await service.remove(req.params.id); res.status(204).end(); } catch (e) { next(e); }
+});
+
+router.post('/generate', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const payload = createSchema.extend({
+      travelers_type: z.string().optional(),
+      constraints: z.record(z.string(), z.any()).optional()
+    }).parse(req.body);
+    let userId: string | undefined;
+    const auth = req.headers.authorization;
+    if (auth?.startsWith('Bearer ')) {
+      try {
+        const token = auth.substring(7);
+        const decoded = jwt.verify(token, env.JWT_SECRET) as { sub?: string };
+        userId = decoded.sub;
+      } catch {}
+    }
+    const created = await service.generateFromPreferences({ ...payload, userId });
+    res.status(201).json(created);
+  } catch (e) { next(e); }
 });
 
 export default router;
