@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   MapPin, 
@@ -18,6 +18,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 export const HomePage: React.FC = () => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [email, setEmail] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const t = window.setTimeout(() => setMounted(true), 0);
+    return () => window.clearTimeout(t);
+  }, []);
 
   const faqItems = [
     {
@@ -53,16 +59,37 @@ export const HomePage: React.FC = () => {
       {/* Hero Section */}
       <section className="pt-24 pb-16 px-4">
         <div className="container mx-auto text-center">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold text-primary mb-6 leading-tight">
+          <div
+            className={`max-w-4xl mx-auto ${mounted ? 'opacity-100' : 'opacity-0'}`}
+            style={{
+              transition: 'opacity 400ms cubic-bezier(0.4, 0, 0.2, 1)'
+            }}
+          >
+            <h1
+              className={`text-4xl md:text-6xl font-bold text-primary mb-6 leading-tight ${mounted ? 'opacity-100' : 'opacity-0'}`}
+              style={{
+                transition: 'opacity 450ms cubic-bezier(0.4, 0, 0.2, 1)',
+                willChange: 'opacity'
+              }}
+            >
               Il tuo viaggio perfetto
               <span className="bg-gradient-to-r from-accent to-accent-dark bg-clip-text text-transparent"> in pochi minuti</span>
             </h1>
-            <p className="text-xl text-neutral-600 mb-8 leading-relaxed">
+            <p
+              className={`text-xl text-neutral-600 mb-8 leading-relaxed ${mounted ? 'opacity-100' : 'opacity-0'}`}
+              style={{
+                transition: 'opacity 450ms cubic-bezier(0.4, 0, 0.2, 1) 80ms'
+              }}
+            >
               Lascia che l'intelligenza artificiale crei il tuo itinerario personalizzato. 
               Voli, alloggi, esperienze e ristoranti ottimizzati per te.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <div
+              className={`flex flex-col sm:flex-row gap-4 justify-center mb-12 ${mounted ? 'opacity-100' : 'opacity-0'}`}
+              style={{
+                transition: 'opacity 450ms cubic-bezier(0.4, 0, 0.2, 1) 160ms'
+              }}
+            >
               <Link to="/create">
                 <Button variant="primary" size="lg">
                   <Sparkles className="w-5 h-5 mr-2" />

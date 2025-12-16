@@ -23,7 +23,7 @@ function AppContent() {
     const force = params.get('welcome') === '1'
     if (force) localStorage.removeItem('welcomeSeen')
     const seen = localStorage.getItem('welcomeSeen')
-    if ((force && location.pathname === '/') || (!seen && location.pathname === '/')) setShowWelcome(true)
+    if (force || !seen) setShowWelcome(true)
   }, [location.pathname, location.search])
   useEffect(() => {
     if ('serviceWorker' in navigator) {
