@@ -6,6 +6,8 @@ import { Button } from '../components/ui/Button'
 import { pushToast } from '../store/slices/uiSlice'
 import { Link, useNavigate } from 'react-router-dom'
 import type React from 'react'
+import { isStaticMode } from '../utils/env'
+import { localAuth } from '../services/localAuth'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -14,13 +16,16 @@ export default function LoginPage() {
   const [login] = useLoginMutation()
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const staticMode = isStaticMode()
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const valid = /.+@.+\..+/.test(email) && password.length >= 8
     if (!valid) return dispatch(setError('Credenziali non valide'))
     dispatch(setLoading())
-    const res = await login({ email, password }).unwrap().catch(() => { dispatch(setError('Login fallito')); dispatch(pushToast({ id: Date.now().toString(), message: 'Login fallito', type: 'error' })); return null })
+    const res = staticMode
+      ? (() => { try { return localAuth.login(email, password) } catch { return null } })()
+      : await login({ email, password }).unwrap().catch(() => { dispatch(setError('Login fallito')); dispatch(pushToast({ id: Date.now().toString(), message: 'Login fallito', type: 'error' })); return null })
     if (res) {
       dispatch(setAuth({ user: res.user, token: res.access_token }))
       dispatch(pushToast({ id: Date.now().toString(), message: 'Benvenuto!', type: 'success' }))

@@ -10,6 +10,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Spinner } from '../components/ui/Spinner'
 import { RootState } from '../store'
 import type { ItineraryData, ItineraryDay, Activity, Restaurant } from '../types'
+import { staticApi } from '../services/staticApi'
 
 export default function BookingPage() {
   const [destination, setDestination] = useState('')
@@ -24,8 +25,13 @@ export default function BookingPage() {
   const navigate = useNavigate()
   const { id } = useParams()
   const resources = useSelector((s: RootState) => s.booking.resources)
-  const { data, isLoading, isError } = useGetQuery(id || '', { skip: !id })
-  const itineraryData: ItineraryData | undefined = useMemo(() => (data as any)?.itinerary_data, [data])
+  const staticMode = import.meta.env.VITE_STATIC_MODE === 'true'
+  const { data, isLoading, isError } = useGetQuery(id || '', { skip: !id || staticMode })
+  const staticItem = staticMode && id ? staticApi.get(id) : undefined
+  const itineraryData: ItineraryData | undefined = useMemo(
+    () => (staticMode ? (staticItem as any)?.itinerary_data : (data as any)?.itinerary_data),
+    [data, staticItem, staticMode]
+  )
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -57,7 +63,7 @@ export default function BookingPage() {
 
   if (id) {
     if (isLoading) return <div className="p-8"><Spinner /></div>
-    if (isError || !data) return <div className="p-8">Errore nel caricamento</div>
+    if ((!staticMode && (isError || !data)) || (staticMode && !staticItem)) return <div className="p-8">Errore nel caricamento</div>
     return (
       <div className="container mx-auto p-6 space-y-6">
         <div className="grid md:grid-cols-3 gap-4">
@@ -66,11 +72,11 @@ export default function BookingPage() {
               <CardTitle className="text-lg">Dettaglio prenotazione</CardTitle>
             </CardHeader>
             <CardContent className="space-y-1">
-              <div>Destinazione: {data.destination}</div>
-              <div>Date: {data.start_date} → {data.end_date}</div>
-              <div>Persone: {data.travelers_count}</div>
-              <div>Budget: {data.budget}</div>
-              <div>Pace: {data.pace}</div>
+              <div>Destinazione: {(staticMode ? staticItem : data)?.destination}</div>
+              <div>Date: {(staticMode ? staticItem : data)?.start_date} → {(staticMode ? staticItem : data)?.end_date}</div>
+              <div>Persone: {(staticMode ? staticItem : data)?.travelers_count}</div>
+              <div>Budget: {(staticMode ? staticItem : data)?.budget}</div>
+              <div>Pace: {(staticMode ? staticItem : data)?.pace}</div>
               <Button className="mt-3" onClick={onPay}>Paga</Button>
             </CardContent>
           </Card>
@@ -100,9 +106,10 @@ export default function BookingPage() {
                     value={selectedIndex}
                     onChange={(e) => setSelectedIndex(Number(e.target.value))}
                   >
-                    {itineraryData.proposals.map((p, idx) => (
-                      <option key={p.id} value={idx}>{p.title} (compatibilità {Math.round(p.compatibility_score * 100)}%)</option>
-                    ))}
+                    {itineraryData.proposals.map((p, idx) => {
+                      const compat = typeof p.compatibility_score === 'number' ? Math.round(p.compatibility_score * 100) : 'N/D'
+                      return <option key={p.id} value={idx}>{p.title} (compatibilità {compat}%)</option>
+                    })}
                   </select>
                   <Button onClick={onSelectProposal}>Salva selezione</Button>
                 </div>
@@ -110,19 +117,20 @@ export default function BookingPage() {
                   {(() => {
                     const proposal = itineraryData.proposals[selectedIndex]
                     if (!proposal) return null
+                    const compat = typeof proposal.compatibility_score === 'number' ? Math.round(proposal.compatibility_score * 100) : undefined
                     return (
                       <div>
                         <h3 className="text-xl font-semibold text-primary mb-2">{proposal.title}</h3>
                         <p className="text-neutral-600 mb-4">{proposal.description}</p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                           <Card><CardContent>
-                            <div>Compatibilità: {Math.round(proposal.compatibility_score * 100)}%</div>
+                            <div>Compatibilità: {compat !== undefined ? `${compat}%` : 'N/D'}</div>
                           </CardContent></Card>
                           <Card><CardContent>
-                            <div>Durata: {proposal.duration} giorni</div>
+                            <div>Durata: {proposal.duration ?? 'N/D'} giorni</div>
                           </CardContent></Card>
                           <Card><CardContent>
-                            <div>Budget stimato: €{proposal.estimated_budget}</div>
+                            <div>Budget stimato: €{proposal.estimated_budget ?? 'N/D'}</div>
                           </CardContent></Card>
                         </div>
                         <div className="space-y-8">

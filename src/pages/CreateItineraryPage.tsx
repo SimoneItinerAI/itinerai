@@ -20,13 +20,16 @@ import {
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { TravelPreferences } from '../types';
-import { useGenerateMutation } from '../services/bookingApi';
+import { useGenerateMutation, useRefineMutation } from '../services/bookingApi';
 import { useDispatch } from 'react-redux';
 import { pushToast } from '../store/slices/uiSlice';
 import { useNavigate } from 'react-router-dom';
+import { staticApi } from '../services/staticApi';
 
 export const CreateItineraryPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [result, setResult] = useState<any | null>(null);
+  const [refineText, setRefineText] = useState('');
   const [preferences, setPreferences] = useState<TravelPreferences>({
     destination: '',
     startDate: '',
@@ -43,6 +46,7 @@ export const CreateItineraryPage: React.FC = () => {
     notes: ''
   });
   const [generateItinerary, { isLoading }] = useGenerateMutation();
+  const [refine, { isLoading: isRefining }] = useRefineMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -68,6 +72,7 @@ export const CreateItineraryPage: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
+      const staticMode = import.meta.env.VITE_STATIC_MODE === 'true'
       const payload = {
         destination: preferences.destination,
         start_date: preferences.startDate,
@@ -85,11 +90,23 @@ export const CreateItineraryPage: React.FC = () => {
         },
         notes: preferences.notes
       };
-      const result = await generateItinerary(payload).unwrap();
+      const res = staticMode ? { itinerary: staticApi.generate(payload), days: [], items: [] } : await generateItinerary(payload).unwrap();
+      setResult(res);
       dispatch(pushToast({ id: Date.now().toString(), message: 'Itinerario generato', type: 'success' }));
-      navigate(`/booking/${result.id}`);
     } catch (e: any) {
       dispatch(pushToast({ id: Date.now().toString(), message: e?.data?.error?.message || 'Errore generazione', type: 'error' }));
+    }
+  };
+  
+  const handleRefine = async () => {
+    if (!result?.itinerary?.id || !refineText.trim()) return;
+    try {
+      const res = await refine({ id: result.itinerary.id, instructions: refineText.trim() }).unwrap();
+      setResult(res);
+      setRefineText('');
+      dispatch(pushToast({ id: Date.now().toString(), message: 'Itinerario aggiornato', type: 'success' }));
+    } catch (e: any) {
+      dispatch(pushToast({ id: Date.now().toString(), message: e?.data?.error?.message || 'Errore raffinamento', type: 'error' }));
     }
   };
 
@@ -522,6 +539,68 @@ export const CreateItineraryPage: React.FC = () => {
               </Button>
             )}
           </div>
+          
+          {/* Risultato */}
+          {result && (
+            <Card className="mt-8">
+              <CardHeader>
+                <CardTitle className="text-lg">Risultato</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex flex-col md:flex-row md:items-end gap-3">
+                  <div className="flex-1">
+                    <label className="block text-sm font-semibold text-primary mb-2">Raffina con istruzioni (conversazione)</label>
+                    <input
+                      type="text"
+                      placeholder="Es. più attività all’aperto, riduci camminate, aggiungi museo moderno..."
+                      value={refineText}
+                      onChange={(e) => setRefineText(e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-secondary focus:outline-none transition-colors"
+                    />
+                  </div>
+                  <Button variant="primary" onClick={handleRefine} disabled={isRefining || !refineText.trim()}>
+                    {isRefining ? 'Aggiornamento...' : 'Raffina itinerario'}
+                  </Button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card><CardContent>
+                    <div><strong>Destinazione:</strong> {result.itinerary?.destination}</div>
+                  </CardContent></Card>
+                  <Card><CardContent>
+                    <div><strong>Date:</strong> {result.itinerary?.start_date?.toString?.() || result.itinerary?.start_date} → {result.itinerary?.end_date?.toString?.() || result.itinerary?.end_date}</div>
+                  </CardContent></Card>
+                  <Card><CardContent>
+                    <div><strong>Persone:</strong> {result.itinerary?.travelers_count}</div>
+                  </CardContent></Card>
+                </div>
+                <div className="space-y-8">
+                  {result.days?.map((day: any) => (
+                    <div key={day.id} className="border-l-4 border-accent pl-4">
+                      <h4 className="text-lg font-semibold text-primary mb-2">{day.label} • {new Date(day.date).toISOString().slice(0,10)}</h4>
+                      <div className="space-y-3">
+                        {result.items?.filter((i: any) => i.day_id === day.id).map((item: any) => (
+                          <div key={item.id} className="p-3 rounded border">
+                            <div className="font-semibold text-primary">{item.title}</div>
+                            {item.start_time || item.end_time ? (
+                              <div className="text-sm">{[item.start_time, item.end_time].filter(Boolean).join(' - ')}</div>
+                            ) : null}
+                            {item.description && <div className="text-neutral-700 text-sm">{item.description}</div>}
+                            {item.externalUrl && (
+                              <div className="mt-2">
+                                <Button variant="outline" onClick={() => window.open(item.externalUrl, '_blank')}>
+                                  {item.externalProvider === 'booking' ? 'Vedi hotel' : 'Vedi attività'}
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

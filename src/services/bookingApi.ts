@@ -29,8 +29,12 @@ export const bookingApi = api.injectEndpoints({
       query: (body) => ({ url: '/itineraries', method: 'POST', body }),
       invalidatesTags: ['Booking']
     }),
-    generate: builder.mutation<Itinerary, any>({
+    generate: builder.mutation<any, any>({
       query: (body) => ({ url: '/itineraries/generate', method: 'POST', body }),
+      invalidatesTags: ['Booking']
+    }),
+    refine: builder.mutation<any, { id: string; instructions: string }>({
+      query: (body) => ({ url: '/itineraries/refine', method: 'POST', body }),
       invalidatesTags: ['Booking']
     }),
     get: builder.query<Itinerary, string>({
@@ -48,4 +52,4 @@ export const bookingApi = api.injectEndpoints({
   })
 })
 
-export const { useListQuery, useCreateMutation, useGenerateMutation, useGetQuery, useUpdateMutation, useRemoveMutation } = bookingApi
+export const { useListQuery, useCreateMutation, useGenerateMutation, useRefineMutation, useGetQuery, useUpdateMutation, useRemoveMutation } = bookingApi

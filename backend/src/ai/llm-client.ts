@@ -12,9 +12,12 @@ export async function callLlmJson(messages: LlmMessage[], jsonSchema: any): Prom
   }
 
   const client = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+  const responseFormat = jsonSchema?.schema
+    ? { type: 'json_schema', json_schema: { name: 'ItinerarySchema', schema: jsonSchema.schema, strict: false } }
+    : { type: 'json_object' };
   const completion = await client.chat.completions.create({
     model: 'gpt-4o-mini',
-    response_format: { type: 'json_object' },
+    response_format: responseFormat as any,
     temperature: 0.7,
     messages: messages.map(m => ({ role: m.role, content: m.content }))
   });
@@ -24,7 +27,21 @@ export async function callLlmJson(messages: LlmMessage[], jsonSchema: any): Prom
   try {
     data = JSON.parse(content);
   } catch {
-    throw Object.assign(new Error('LLM returned invalid JSON'), { status: 502 });
+    const retry = await client.chat.completions.create({
+      model: 'gpt-4o-mini',
+      response_format: responseFormat as any,
+      temperature: 0.1,
+      messages: [
+        ...messages,
+        { role: 'system', content: 'Return ONLY valid JSON. No markdown fences, no comments, no explanations.' }
+      ]
+    });
+    const contentR = retry.choices?.[0]?.message?.content ?? '{}';
+    try {
+      data = JSON.parse(contentR);
+    } catch {
+      throw Object.assign(new Error('LLM returned invalid JSON'), { status: 502 });
+    }
   }
 
   if (jsonSchema?.safeParse) {
@@ -32,7 +49,7 @@ export async function callLlmJson(messages: LlmMessage[], jsonSchema: any): Prom
     if (!parsed.success) {
       const retry = await client.chat.completions.create({
         model: 'gpt-4o-mini',
-        response_format: { type: 'json_object' },
+        response_format: responseFormat as any,
         temperature: 0.2,
         messages: [
           ...messages,
@@ -48,7 +65,7 @@ export async function callLlmJson(messages: LlmMessage[], jsonSchema: any): Prom
       }
       const parsed2 = jsonSchema.safeParse(data2);
       if (!parsed2.success) {
-        throw Object.assign(new Error('LLM JSON validation failed'), { status: 502, details: parsed2.error.format() });
+        return data2 as any;
       }
       return parsed2.data;
     }

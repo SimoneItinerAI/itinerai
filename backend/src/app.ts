@@ -26,6 +26,10 @@ app.use(express.json());
 app.use(rateLimit({ windowMs: 60_000, max: 100 }));
 app.use((httpLogger as any)({ logger }));
 
+app.get('/health', (_req, res) => {
+  res.json({ ok: true });
+});
+
 app.use('/api', router);
 if (process.env.NODE_ENV !== 'test') {
   import('./docs/swagger.js').then(({ specs }) => {

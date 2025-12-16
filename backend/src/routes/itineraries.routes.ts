@@ -63,4 +63,13 @@ router.post('/generate', async (req: Request, res: Response, next: NextFunction)
   } catch (e) { next(e); }
 });
 
+router.post('/refine', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const schema = z.object({ id: z.string(), instructions: z.string().min(1) })
+    const { id, instructions } = schema.parse(req.body)
+    const updated = await service.refineItinerary({ id, instructions })
+    res.status(200).json(updated)
+  } catch (e) { next(e) }
+})
+
 export default router;

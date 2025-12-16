@@ -9,6 +9,7 @@
       "DOM.Iterable"
     ],
     "module": "ESNext",
+    "esModuleInterop": true,
     "skipLibCheck": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -23,6 +24,7 @@
     "noUncheckedSideEffectImports": false,
     "forceConsistentCasingInFileNames": false,
     "baseUrl": "./",
+    "types": ["jest", "@testing-library/jest-dom"],
     "paths": {
       "@/*": [
         "./src/*"

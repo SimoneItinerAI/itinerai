@@ -19,9 +19,17 @@ function AppContent() {
   const location = useLocation()
   const [showWelcome, setShowWelcome] = useState(false)
   useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const force = params.get('welcome') === '1'
+    if (force) localStorage.removeItem('welcomeSeen')
     const seen = localStorage.getItem('welcomeSeen')
-    if (!seen && location.pathname === '/') setShowWelcome(true)
-  }, [location.pathname])
+    if ((force && location.pathname === '/') || (!seen && location.pathname === '/')) setShowWelcome(true)
+  }, [location.pathname, location.search])
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {})
+    }
+  }, [])
   return (
     <div className="min-h-screen bg-neutral-50">
       {showWelcome && (

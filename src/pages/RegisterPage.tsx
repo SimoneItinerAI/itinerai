@@ -6,6 +6,7 @@ import { pushToast } from '../store/slices/uiSlice'
 import { Button } from '../components/ui/Button'
 import { useNavigate, Link } from 'react-router-dom'
 import type React from 'react'
+import { localAuth } from '../services/localAuth'
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('')
@@ -15,13 +16,16 @@ export default function RegisterPage() {
   const [register] = useRegisterMutation()
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const staticMode = import.meta.env.VITE_STATIC_MODE === 'true'
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const valid = /.+@.+\..+/.test(email) && password.length >= 8 && password === confirm && name.length > 0
     if (!valid) return dispatch(setError('Dati non validi'))
     dispatch(setLoading())
-    const res = await register({ email, password, name }).unwrap().catch(() => { dispatch(setError('Registrazione fallita')); dispatch(pushToast({ id: Date.now().toString(), message: 'Registrazione fallita', type: 'error' })); return null })
+    const res = staticMode
+      ? (() => { try { return localAuth.register(email, password, name) } catch { return null } })()
+      : await register({ email, password, name }).unwrap().catch(() => { dispatch(setError('Registrazione fallita')); dispatch(pushToast({ id: Date.now().toString(), message: 'Registrazione fallita', type: 'error' })); return null })
     if (res) {
       dispatch(setAuth({ user: res.user, token: res.access_token }))
       dispatch(pushToast({ id: Date.now().toString(), message: 'Account creato', type: 'success' }))
