@@ -49,7 +49,14 @@ export const bookingApi = api.injectEndpoints({
       query: (id) => ({ url: `/itineraries/${id}`, method: 'DELETE' }),
       invalidatesTags: ['Booking']
     })
+    ,
+    normalizePreferences: builder.mutation<any, any>({
+      query: (body) => ({ url: '/preferences', method: 'POST', body })
+    }),
+    aggregateSearch: builder.mutation<{ results: any[] }, any>({
+      query: (body) => ({ url: '/search/aggregate', method: 'POST', body })
+    })
   })
 })
 
-export const { useListQuery, useCreateMutation, useGenerateMutation, useRefineMutation, useGetQuery, useUpdateMutation, useRemoveMutation } = bookingApi
+export const { useListQuery, useCreateMutation, useGenerateMutation, useRefineMutation, useGetQuery, useUpdateMutation, useRemoveMutation, useNormalizePreferencesMutation, useAggregateSearchMutation } = bookingApi

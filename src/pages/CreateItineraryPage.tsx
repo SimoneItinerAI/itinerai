@@ -20,7 +20,7 @@ import {
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { TravelPreferences } from '../types';
-import { useGenerateMutation, useRefineMutation } from '../services/bookingApi';
+import { useGenerateMutation, useRefineMutation, useNormalizePreferencesMutation, useAggregateSearchMutation } from '../services/bookingApi';
 import { useDispatch } from 'react-redux';
 import { pushToast } from '../store/slices/uiSlice';
 import { useNavigate } from 'react-router-dom';
@@ -47,6 +47,8 @@ export const CreateItineraryPage: React.FC = () => {
   });
   const [generateItinerary, { isLoading }] = useGenerateMutation();
   const [refine, { isLoading: isRefining }] = useRefineMutation();
+  const [normalizePreferences] = useNormalizePreferencesMutation();
+  const [aggregateSearch] = useAggregateSearchMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -90,8 +92,26 @@ export const CreateItineraryPage: React.FC = () => {
         },
         notes: preferences.notes
       };
-      const res = staticMode ? { itinerary: staticApi.generate(payload), days: [], items: [] } : await generateItinerary(payload).unwrap();
+      const prefsInput = {
+        destination: payload.destination,
+        startDate: payload.start_date,
+        endDate: payload.end_date,
+        durationDays: undefined,
+        travelers: { adults: payload.travelers_count, children: 0 },
+        budgetTotalEur: 0,
+        tripStyle: payload.pace === 'tranquillo' ? 'relaxed' : payload.pace === 'equilibrato' ? 'balanced' : 'fast',
+        interests: payload.interests || [],
+        constraints: Object.keys(payload.constraints || {})
+      }
+      const normalized = staticMode ? prefsInput : await normalizePreferences(prefsInput).unwrap()
+      const searchReq = { destination: payload.destination, startDate: payload.start_date, endDate: payload.end_date, travelers: { adults: payload.travelers_count, children: 0 }, interests: payload.interests || [] }
+      const allowed = staticMode ? { results: [] } : await aggregateSearch(searchReq).unwrap()
+      const res = staticMode
+        ? { itinerary: staticApi.generate(payload), days: [], items: [] }
+        : await generateItinerary({ ...payload, search_results: allowed.results }).unwrap();
       setResult(res);
+      // show normalized summary
+      dispatch(pushToast({ id: Date.now().toString(), message: `Preferenze normalizzate per ${normalized.destination?.city || normalized.destination?.raw || payload.destination}`, type: 'info' }));
       dispatch(pushToast({ id: Date.now().toString(), message: 'Itinerario generato', type: 'success' }));
     } catch (e: any) {
       dispatch(pushToast({ id: Date.now().toString(), message: e?.data?.error?.message || 'Errore generazione', type: 'error' }));

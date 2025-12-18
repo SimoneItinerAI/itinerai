@@ -13,7 +13,7 @@ export async function callLlmJson(messages: LlmMessage[], jsonSchema: any): Prom
 
   const client = new OpenAI({ apiKey: env.OPENAI_API_KEY });
   const responseFormat = jsonSchema?.schema
-    ? { type: 'json_schema', json_schema: { name: 'ItinerarySchema', schema: jsonSchema.schema, strict: false } }
+    ? { type: 'json_schema', json_schema: { name: 'ItinerarySchema', schema: jsonSchema.schema, strict: true } }
     : { type: 'json_object' };
   const completion = await client.chat.completions.create({
     model: 'gpt-4o-mini',

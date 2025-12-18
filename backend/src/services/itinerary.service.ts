@@ -127,8 +127,11 @@ export class ItineraryService {
     await this.cache.del('itineraries:list');
   }
 
-  async generateFromPreferences(input: GenerateItineraryInput) {
-    const planned = await planItineraryWithOpenAi(input)
+  async generateFromPreferences(input: GenerateItineraryInput, opts?: { searchResults?: Array<{ id: string; title: string; category: string; bookingUrl: string }> }) {
+    const key = 'itgen:' + JSON.stringify({ input, search: (opts?.searchResults || []).map(r => r.id) })
+    const cachedPlan = await this.cache.get(key)
+    const planned = cachedPlan || await planItineraryWithOpenAi(input)
+    if (!cachedPlan) await this.cache.set(key, planned, 600)
     const plannedParsed = PlannedItinerarySchema.safeParse(planned)
     const makeDateRange = (start: string, end: string) => {
       const s = new Date(start)
@@ -286,22 +289,26 @@ export class ItineraryService {
         const type = item.type
         let external_provider: string | undefined
         let external_product_id: string | undefined
-        if (type === 'activity') {
-          external_provider = 'getyourguide'
-          external_product_id = buildGetYourGuideSearchUrl({
-            destination: input.destination,
-            date: dayPlan.date,
-            category: item.category
+        if (opts?.searchResults?.length) {
+          const match = opts.searchResults.find(r => {
+            const cat = (item.category || type)
+            return (r.category === 'experience' && type === 'activity')
+              || (r.category === 'hotel' && type === 'accommodation')
+              || (r.category?.toLowerCase?.() === cat?.toLowerCase?.())
           })
+          if (match) {
+            external_product_id = match.bookingUrl
+            external_provider = match.bookingUrl.includes('getyourguide') ? 'getyourguide' : (match.bookingUrl.includes('booking') ? 'booking' : 'external')
+          }
         }
-        if (type === 'accommodation') {
-          external_provider = 'booking'
-          external_product_id = buildBookingSearchUrl({
-            destination: input.destination,
-            startDate: input.start_date,
-            endDate: input.end_date,
-            adults: input.travelers_count
-          })
+        if (!external_product_id) {
+          if (type === 'activity') {
+            external_provider = 'getyourguide'
+            external_product_id = buildGetYourGuideSearchUrl({ destination: input.destination, date: dayPlan.date, category: item.category })
+          } else if (type === 'accommodation') {
+            external_provider = 'booking'
+            external_product_id = buildBookingSearchUrl({ destination: input.destination, startDate: input.start_date, endDate: input.end_date, adults: input.travelers_count })
+          }
         }
         let created: any
         if (this.prisma) {

@@ -47,7 +47,8 @@ router.post('/generate', async (req: Request, res: Response, next: NextFunction)
   try {
     const payload = createSchema.extend({
       travelers_type: z.string().optional(),
-      constraints: z.record(z.string(), z.any()).optional()
+      constraints: z.record(z.string(), z.any()).optional(),
+      search_results: z.array(z.object({ id: z.string(), title: z.string(), category: z.string(), bookingUrl: z.string().url() })).optional()
     }).parse(req.body);
     let userId: string | undefined;
     const auth = req.headers.authorization;
@@ -58,7 +59,7 @@ router.post('/generate', async (req: Request, res: Response, next: NextFunction)
         userId = decoded.sub;
       } catch {}
     }
-    const created = await service.generateFromPreferences({ ...payload, userId });
+    const created = await service.generateFromPreferences({ ...payload, userId }, { searchResults: payload.search_results });
     res.status(201).json(created);
   } catch (e) { next(e); }
 });

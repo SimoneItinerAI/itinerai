@@ -16,6 +16,12 @@ dist-ssr
 backend/.env
 *.env
 
+# SSH keys or private keys (do not commit)
+*.pem
+*.key
+*.pub
+ItinerAI 2
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
